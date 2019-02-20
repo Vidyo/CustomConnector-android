@@ -188,8 +188,8 @@ public class VideoConferenceActivity extends FragmentActivity implements Connect
 
                 if (state) {
                     if (Preferences.get(Preferences.GUEST_API_ENABLED_KEY, false)) {
-                        connector.connectToRoomAsGuest(ConnectParams.PORTAL_HOST, ConnectParams.PORTAL_NAME,
-                                ConnectParams.PORTAL_ROOM, "", this);
+                        connector.connectToRoomAsGuest(ConnectParams.PORTAL_HOST, ConnectParams.ROOM_DISPLAY_NAME,
+                                ConnectParams.ROOM_KEY, ConnectParams.ROOM_PIN, this);
                     } else {
                         connector.connect(ConnectParams.HOST, ConnectParams.TOKEN, ConnectParams.DISPLAY_NAME, ConnectParams.RESOURCE, this);
                     }

@@ -40,8 +40,8 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private String patchGuestCred() {
-        return String.format("Portal: %1s\nRoom key: %2s\nGuest Name: %3s",
-                ConnectParams.PORTAL_HOST, ConnectParams.PORTAL_ROOM, ConnectParams.PORTAL_NAME);
+        return String.format("Portal: %1s\nRoom key: %2s\nGuest Name: %3s\nPin: %4s",
+                ConnectParams.PORTAL_HOST, ConnectParams.ROOM_KEY, ConnectParams.ROOM_DISPLAY_NAME, ConnectParams.ROOM_PIN);
     }
 
     private String patchIOCred() {

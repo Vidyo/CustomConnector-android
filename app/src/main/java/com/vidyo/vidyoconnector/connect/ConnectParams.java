@@ -32,6 +32,7 @@ public final class ConnectParams {
      * CONNECT AS GUEST [BETA]
      */
     public static final String PORTAL_HOST = "<tenant>.vidyo.portal.com";
-    public static final String PORTAL_ROOM = "DUMMY_KEY";
-    public static final String PORTAL_NAME = "Guest Name";
+    public static final String ROOM_KEY = "DUMMY_KEY";
+    public static final String ROOM_DISPLAY_NAME = "Guest Name";
+    public static final String ROOM_PIN = "";
 }
