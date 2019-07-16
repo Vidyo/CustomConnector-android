@@ -5,7 +5,7 @@ Lean more: https://developer.vidyo.io
 Developer documentation: https://developer.vidyo.io/documentation/latest
 
 # Clone
-git clone https://github.com/Vidyo/CustomConnector-android.git
+git clone https://github.com/Vidyo/vidyo.io-custom-connector-android.git
 
 # Build and Run Application
 
