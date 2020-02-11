@@ -7,15 +7,19 @@ Developer documentation: https://developer.vidyo.io/documentation/latest
 # Clone
 git clone https://github.com/Vidyo/vidyo.io-custom-connector-android.git
 
+## Acquire VidyoClient Android SDK
+
+1. Download the latest VidyoClient Android SDK package [here](https://static.vidyo.io/latest/package/VidyoClient-AndroidSDK.zip) and unzip it.
+2. Copy the SDK package content located at */VidyoClient-AndroidSDK/lib/android* to the */app/libs/* folder.
+
 # Build and Run Application
 
-Acquire the Android Vidyo Client SDK: https://static.vidyo.io/latest/package/VidyoClient-AndroidSDK.zip
-
-#### Android Studio 3.3 | Gradle tools: 3.3.0 | Target SDK version: 28 | Min SDK 22 version: 22
+#### Android Studio 3.3 | Gradle tools: 3.3.0 | Target SDK version: 28 | Min SDK version: 22
 
 - Upgrade Gradle file if neccessary
 - Download required build-tools
 - Sync/Clean/Build the project
+- Refresh gradle project
 
 ## Configure credentials
 
