@@ -1,7 +1,8 @@
 package com.vidyo.vidyoconnector;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import androidx.fragment.app.FragmentActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
@@ -24,17 +25,16 @@ import com.vidyo.vidyoconnector.tiles.CustomTilesHelper;
 import com.vidyo.vidyoconnector.tiles.RemoteHolder;
 import com.vidyo.vidyoconnector.utils.AppUtils;
 import com.vidyo.vidyoconnector.utils.Logger;
-import com.vidyo.vidyoconnector.utils.Preferences;
 import com.vidyo.vidyoconnector.view.ControlView;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class VideoConferenceActivity extends FragmentActivity implements Connector.IConnect, Connector.IRegisterLocalCameraEventListener,
-        Connector.IRegisterRemoteCameraEventListener, Connector.IRegisterLocalSpeakerEventListener,
-        Connector.IRegisterRemoteMicrophoneEventListener, Connector.IRegisterLocalMicrophoneEventListener,
-        Connector.IRegisterResourceManagerEventListener, Connector.IRegisterRemoteWindowShareEventListener,
-        Connector.IRegisterParticipantEventListener, IControlLink {
+public class VideoConferenceActivity extends FragmentActivity implements Connector.IConnect,
+        Connector.IRegisterLocalCameraEventListener, Connector.IRegisterRemoteCameraEventListener,
+        Connector.IRegisterLocalSpeakerEventListener, Connector.IRegisterRemoteMicrophoneEventListener,
+        Connector.IRegisterLocalMicrophoneEventListener, Connector.IRegisterResourceManagerEventListener,
+        Connector.IRegisterRemoteWindowShareEventListener, Connector.IRegisterParticipantEventListener, IControlLink {
 
     private ControlView controlView;
     private View progressBar;
@@ -42,6 +42,7 @@ public class VideoConferenceActivity extends FragmentActivity implements Connect
     private Connector connector;
 
     private AtomicBoolean isCameraDisabledForBackground = new AtomicBoolean(false);
+    private AtomicBoolean isDisconnectAndQuit = new AtomicBoolean(false);
 
     private CustomTilesHelper customTilesHelper;
 
@@ -124,6 +125,12 @@ public class VideoConferenceActivity extends FragmentActivity implements Connect
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (customTilesHelper != null) customTilesHelper.requestInvalidate();
+    }
+
+    @Override
     public void onSuccess() {
         if (!connector.registerResourceManagerEventListener(this)) {
             Logger.e("Failed to register resource manager event listener");
@@ -170,6 +177,11 @@ public class VideoConferenceActivity extends FragmentActivity implements Connect
             controlView.disable(false);
 
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+            /* Wrap up the conference */
+            if (isDisconnectAndQuit.get()) {
+                finish();
+            }
         });
     }
 
@@ -186,15 +198,15 @@ public class VideoConferenceActivity extends FragmentActivity implements Connect
                 boolean state = (boolean) event.getValue();
                 controlView.updateConnectionState(state ? ControlView.ConnectionState.CONNECTING : ControlView.ConnectionState.DISCONNECTING);
 
+                if (connector == null) {
+                    Logger.e("Connector is null");
+                    return;
+                }
+
                 if (state) {
-                    if (Preferences.get(Preferences.GUEST_API_ENABLED_KEY, false)) {
-                        connector.connectToRoomAsGuest(ConnectParams.PORTAL_HOST, ConnectParams.ROOM_DISPLAY_NAME,
-                                ConnectParams.ROOM_KEY, ConnectParams.ROOM_PIN, this);
-                    } else {
-                        connector.connect(ConnectParams.HOST, ConnectParams.TOKEN, ConnectParams.DISPLAY_NAME, ConnectParams.RESOURCE, this);
-                    }
+                    connector.connect(ConnectParams.HOST, ConnectParams.TOKEN, ConnectParams.DISPLAY_NAME, ConnectParams.RESOURCE, this);
                 } else {
-                    if (connector != null) connector.disconnect();
+                    connector.disconnect();
                 }
                 break;
             case MUTE_CAMERA:
@@ -234,9 +246,35 @@ public class VideoConferenceActivity extends FragmentActivity implements Connect
     }
 
     @Override
+    public void onBackPressed() {
+        if (connector == null) {
+            Logger.e("Connector is null!");
+            finish();
+            return;
+        }
+
+        Connector.ConnectorState state = connector.getState();
+
+        if (state == Connector.ConnectorState.VIDYO_CONNECTORSTATE_Idle || state == Connector.ConnectorState.VIDYO_CONNECTORSTATE_Ready) {
+            super.onBackPressed();
+        } else {
+            /* You are still connecting or connected */
+            Toast.makeText(this, "You have to disconnect or await connection first", Toast.LENGTH_SHORT).show();
+
+            /* Start disconnection if connected. Quit afterward. */
+            if (state == Connector.ConnectorState.VIDYO_CONNECTORSTATE_Connected && !isDisconnectAndQuit.get()) {
+                isDisconnectAndQuit.set(true);
+                onControlEvent(new ControlEvent<>(ControlEvent.Call.CONNECT_DISCONNECT, false));
+            }
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (controlView != null) controlView.unregisterListener();
+
+        if (customTilesHelper != null) customTilesHelper.shutDown();
 
         if (connector != null) {
             connector.unregisterLocalCameraEventListener();
@@ -292,15 +330,20 @@ public class VideoConferenceActivity extends FragmentActivity implements Connect
     @Override
     public void onRemoteWindowShareAdded(final RemoteWindowShare remoteWindowShare, final Participant participant) {
         Logger.i(VideoConferenceActivity.class, "RemoteHolder share added");
-
-        runOnUiThread(() -> customTilesHelper.attachRemote(new RemoteHolder(participant, remoteWindowShare)));
     }
 
     @Override
     public void onRemoteWindowShareRemoved(RemoteWindowShare remoteWindowShare, final Participant participant) {
         Logger.i(VideoConferenceActivity.class, "RemoteHolder share removed");
+    }
 
-        runOnUiThread(() -> customTilesHelper.detachRemote(participant, true));
+    @Override
+    public void onLoudestParticipantChanged(Participant participant, boolean b) {
+        Logger.i("Loudest participant arrived. Name: %s", participant.getName());
+
+        runOnUiThread(() -> {
+            if (customTilesHelper != null) customTilesHelper.updateLoudest(participant);
+        });
     }
 
     @Override
@@ -386,9 +429,5 @@ public class VideoConferenceActivity extends FragmentActivity implements Connect
     @Override
     public void onDynamicParticipantChanged(ArrayList<Participant> arrayList) {
 
-    }
-
-    @Override
-    public void onLoudestParticipantChanged(Participant participant, boolean b) {
     }
 }

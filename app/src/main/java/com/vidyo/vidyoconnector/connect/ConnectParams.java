@@ -27,12 +27,4 @@ public final class ConnectParams {
      * Generated on https://developer.vidyo.io/#/generate-token
      */
     public static final String TOKEN = "";
-
-    /**
-     * CONNECT AS GUEST [BETA]
-     */
-    public static final String PORTAL_HOST = "<tenant>.vidyo.portal.com";
-    public static final String ROOM_KEY = "DUMMY_KEY";
-    public static final String ROOM_DISPLAY_NAME = "Guest Name";
-    public static final String ROOM_PIN = "";
 }

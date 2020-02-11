@@ -9,19 +9,6 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <android.support.v7.widget.SwitchCompat
-        android:id="@+id/enable_guest_join_api"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/enable_guest_join_beta" />
-
-    <TextView
-        android:id="@+id/guest_api_credentials"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/material_margin"
-        tools:text="Guest API cred here" />
-
     <TextView
         android:id="@+id/io_api_credentials"
         android:layout_width="match_parent"

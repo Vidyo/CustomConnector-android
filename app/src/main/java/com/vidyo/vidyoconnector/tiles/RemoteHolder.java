@@ -1,6 +1,6 @@
 package com.vidyo.vidyoconnector.tiles;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.vidyo.VidyoClient.Device.RemoteCamera;
 import com.vidyo.VidyoClient.Device.RemoteWindowShare;
@@ -8,15 +8,18 @@ import com.vidyo.VidyoClient.Endpoint.Participant;
 
 import java.util.Objects;
 
+/**
+ * Holder of remote stream whenever it's Share or Remote Camera.
+ */
 public class RemoteHolder {
 
-    private ViewFrame frame;
     private Participant participant;
 
     private RemoteCamera camera;
     private RemoteWindowShare share;
 
     private boolean isShare;
+    private boolean isRendering;
 
     private RemoteHolder(Participant participant) {
         this.participant = participant;
@@ -34,10 +37,6 @@ public class RemoteHolder {
         this.isShare = true;
     }
 
-    public ViewFrame getFrame() {
-        return frame;
-    }
-
     public RemoteCamera getCamera() {
         return camera;
     }
@@ -50,29 +49,36 @@ public class RemoteHolder {
         return participant.id;
     }
 
-    public void updateFrame(ViewFrame frame) {
-        this.frame = frame;
-    }
-
     public boolean isShare() {
         return this.isShare;
     }
 
     public boolean isValid() {
-        return this.frame != null && this.participant != null;
+        return this.participant != null;
+    }
+
+    public void setRendering(boolean rendering) {
+        isRendering = rendering;
+    }
+
+    public boolean isRendering() {
+        return isRendering;
+    }
+
+    public String getName() {
+        return this.participant.getName();
     }
 
     public void release() {
         this.camera = null;
         this.participant = null;
-        this.frame = null;
         this.share = null;
     }
 
     @NonNull
     @Override
     public String toString() {
-        return "RemoteID: " + getId() + ", FrameID: " + frame.getId();
+        return "Remote ID: " + this.getId().substring(0, 5) + ", Share: " + this.isShare;
     }
 
     @Override

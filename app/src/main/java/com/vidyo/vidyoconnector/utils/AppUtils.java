@@ -2,15 +2,18 @@ package com.vidyo.vidyoconnector.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v4.content.FileProvider;
+import androidx.core.content.FileProvider;
 import android.text.TextUtils;
 
 import com.vidyo.vidyoconnector.BuildConfig;
 import com.vidyo.vidyoconnector.connect.ConnectParams;
 
 import java.io.File;
+import java.util.List;
 
 public class AppUtils {
 
@@ -92,18 +95,19 @@ public class AppUtils {
     }
 
     private static String additionalInfo() {
-        StringBuilder builder = new StringBuilder();
+        return "\n\nModel: " + Build.MODEL +
+                "\n" + "Manufactured: " + Build.MANUFACTURER +
+                "\n" + "Brand: " + Build.BRAND +
+                "\n" + "Android OS version: " + Build.VERSION.RELEASE +
+                "\n" + "Hardware : " + Build.HARDWARE +
+                "\n" + "SDK Version : " + Build.VERSION.SDK_INT;
+    }
 
-        builder.append("\n\nModel: ").append(Build.MODEL);
-        builder.append("\n").append("Manufactured: ").append(Build.MANUFACTURER);
-        builder.append("\n").append("Brand: ").append(Build.BRAND);
-        builder.append("\n").append("Android OS version: ").append(Build.VERSION.RELEASE);
-        builder.append("\n").append("Hardware : ").append(Build.HARDWARE);
-        builder.append("\n").append("SDK Version : ").append(Build.VERSION.SDK_INT);
+    public static boolean isLandscape(Resources resources) {
+        return resources.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    }
 
-        builder.append("\n").append("Resource : ").append(ConnectParams.RESOURCE);
-        builder.append("\n").append("Token : ").append(ConnectParams.TOKEN);
-
-        return builder.toString();
+    public static <T> void dump(List<T> list) {
+        for (T t : list) Logger.i("Item: %s", t.toString());
     }
 }
