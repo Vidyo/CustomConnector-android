@@ -2,14 +2,15 @@ package com.vidyo.vidyoconnector.view;
 
 import android.content.Context;
 import android.os.Build;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import com.vidyo.vidyoconnector.R;
 import com.vidyo.vidyoconnector.event.ControlEvent;
@@ -157,6 +158,7 @@ public class ControlView extends LinearLayout implements View.OnClickListener {
                 invalidateState();
                 break;
             case R.id.switch_control:
+                controlEvent = new ControlEvent<>(ControlEvent.Call.CYCLE_CAMERA);
                 break;
             case R.id.more_control:
                 controlMoreLayout.setVisibility(controlMoreLayout.getVisibility() == GONE ? VISIBLE : GONE);
