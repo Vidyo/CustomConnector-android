@@ -14,7 +14,7 @@ git clone https://github.com/Vidyo/vidyo.io-custom-connector-android.git
 
 # Build and Run Application
 
-#### Android Studio 3.3 | Gradle tools: 3.3.0 | Target SDK version: 28 | Min SDK version: 22
+#### Android Studio 4.0 | Gradle tools: 4.0.0 | Target SDK version: 29 | Min SDK version: 22
 
 - Upgrade Gradle file if neccessary
 - Download required build-tools
